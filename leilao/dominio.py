@@ -1,4 +1,3 @@
-import sys
 
 class Usuario:
 
@@ -7,7 +6,7 @@ class Usuario:
         self._carteira = carteira
 
     def propoem_lance(self, leilao, valor):
-        if valor > self._carteira:
+        if self._valor_eh_valido(valor):
             raise ValueError('Valor acima da carteira')
 
         lance = Lance(self, valor)
@@ -22,6 +21,10 @@ class Usuario:
     def nome(self):
         return self._nome
 
+    def _valor_eh_valido(self, valor):
+        return valor > self._carteira
+
+
 class Lance:
 
     def __init__(self, usuario, valor):
@@ -33,15 +36,14 @@ class Leilao:
     def __init__(self, decricao):
         self.descricao = decricao
         self.__lances = []
-        self.maior_lance = sys.float_info.min
-        self.menor_lance = sys.float_info.max
+        self.maior_lance = 0.0
+        self.menor_lance = 0.0
 
     def propoe (self, lance: Lance):
-        if not self.__lances or self.__lances[-1].usuario != lance.usuario and lance.valor > self.__lances[-1].valor:
-            if lance.valor > self.maior_lance:
-                self.maior_lance = lance.valor
-            if lance.valor < self.menor_lance:
+        if self._lance_eh_valido(lance):
+            if not self._tem_lances():
                 self.menor_lance = lance.valor
+            self.maior_lance = lance.valor
             self.__lances.append(lance)
 
         else:
@@ -50,6 +52,19 @@ class Leilao:
     @property
     def lances(self):
         return self.__lances[:]
+
+    def _tem_lances(self):
+        return self.__lances
+
+    def _usuarios_diferentes(self, lance):
+        return self.__lances[-1].usuario != lance.usuario
+
+    def _valor_maior_que_lance_anterior(self, lance):
+        return lance.valor > self.__lances[-1].valor
+
+    def _lance_eh_valido(self,lance):
+        return not self._tem_lances() or (self._usuarios_diferentes(lance) and
+                                          self._valor_maior_que_lance_anterior(lance))
 
 
 
