@@ -52,7 +52,7 @@ class Leilao:
 
     @property
     def lances(self):
-        return self.__lances[:]
+        return self.__lances[:] #clonagem de lista
 
     def _tem_lances(self):
         return self.__lances
